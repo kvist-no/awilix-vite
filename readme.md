@@ -45,7 +45,13 @@ loadModules(container, modules, {
 
 #### Why use { eager: true}?
 
-When using `import.meta.glob` Vite will transform the code into the following output:
+When using `import.meta.glob` Vite will transform the code 
+
+```javascript
+const modules = import.meta.glob('./dir/*.js')
+```
+
+into the following output:
 
 ```javascript
 // code produced by vite
