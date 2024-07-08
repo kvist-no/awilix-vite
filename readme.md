@@ -32,6 +32,18 @@ const container = createContainer();
 
 Use the `import.meta.glob` function to dynamically import your modules. You can use either lazy loading or eager loading.
 
+#### Eager Loading (recommended)
+```javascript
+const modules = import.meta.glob('./path/to/modules/*.js', { eager: true });
+
+loadModules(container, modules, {
+  resolverOptions: {
+    // Optional: Awilix resolver options
+  },
+  formatName: (name) => name // Optional: Custom function to format module names, defaults to camelCase
+});
+```
+
 #### Lazy Loading
 ```javascript
 const modules = import.meta.glob('./path/to/modules/*.js');
@@ -44,18 +56,30 @@ loadModules(container, modules, {
 });
 ```
 
-#### Eager Loading
-```javascript
-const modules = import.meta.glob('./path/to/modules/*.js', { eager: true });
+#### Differences between Lazy and Eager loading
 
-loadModules(container, modules, {
-  resolverOptions: {
-    // Optional: Awilix resolver options
-  },
-  formatName: (name) => name // Optional: Custom function to format module names, defaults to camelCase
-});
+The main difference between "lazy" and "eager" loading with `import.meta.glob` is the transformed output. Using the default lazy import will result in the following output
+
+```javascript
+// code produced by vite
+const modules = {
+  './dir/foo.js': () => import('./dir/foo.js'),
+}
 ```
 
+while using `eager: true` will result in the following output:
+
+```javascript
+// code produced by vite:
+import { setup as __glob__0_0 } from './dir/foo.js'
+import { setup as __glob__0_1 } from './dir/bar.js'
+const modules = {
+  './dir/foo.js': __glob__0_0,
+  './dir/bar.js': __glob__0_1,
+}
+```
+
+This library will load all of the modules immediately in parallel, so there is no large benefit in importing the the modules lazily. Therefore we recommend setting `eager: true`.
 
 ### Example
 Here's a complete example of how to use the awilix-vite plugin to load and register modules.
