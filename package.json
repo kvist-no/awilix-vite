@@ -1,0 +1,16 @@
+{
+  "name": "awilix-vite",
+  "version": "1.0.0",
+  "description": "Use Awilix in Vite projects",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.test.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "awilix": "^10.0.2"
+  },
+  "type": "module"
+}
