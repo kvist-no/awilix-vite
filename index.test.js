@@ -24,6 +24,10 @@ const staticModules = {
     },
 };
 
+const invalidModules = {
+    './dir/invalid.js': { invalidExport: function Invalid() {} },
+};
+
 // Mock functions
 function formatName(name) {
     return name.toUpperCase();
@@ -35,29 +39,25 @@ function createMockContainer() {
 }
 
 // Test dynamic imports
-test('loadModules with dynamic imports', async (t) => {
+test('should throw when using loadModules with dynamic imports (eager: false)', async (t) => {
     const container = createMockContainer();
 
-    await loadModules(container, dynamicModules);
-
-    assert(container.hasRegistration('foo'), 'foo should be registered');
-    assert(container.hasRegistration('bar'), 'bar should be registered');
-    assert(container.hasRegistration('fooBar'), 'fooBar should be registered');
+    await assert.rejects(
+        async () => {
+            await loadModules(container, dynamicModules);
+        },
+        (err) => {
+            assert.strictEqual(err.name, 'AwilixViteError');
+            assert.strictEqual(err.message, "Dynamic imports detected in the result of import.meta.glob. Please set the eager option to true in the import.meta.glob call like this \"import.meta.glob('/*.ts', { eager: true })\".");
+            return true;
+        },
+        'loadModules should throw an error for modules imported without { eager: true }'
+    );
 });
 
-test('loadModules with dynamic imports and options', async (t) => {
-    const container = createMockContainer();
-    const options = { formatName };
-
-    await loadModules(container, dynamicModules, options);
-
-    assert(container.hasRegistration('FOO'), 'FOO should be registered');
-    assert(container.hasRegistration('BAR'), 'BAR should be registered');
-    assert(container.hasRegistration('FOOBAR'), 'FOOBAR should be registered');
-});
 
 // Test static imports
-test('loadModules with static imports', async (t) => {
+test('loadModules with static imports (eager: true)', async (t) => {
     const container = createMockContainer();
 
     await loadModules(container, staticModules);
@@ -68,7 +68,7 @@ test('loadModules with static imports', async (t) => {
 });
 
 // Test static imports
-test('loadModules with static imports and options', async (t) => {
+test('loadModules with static imports and options (eager: true)', async (t) => {
     const container = createMockContainer();
     const options = { formatName };
 
@@ -115,4 +115,21 @@ test('loadModules with custom formatName', async (t) => {
 
     assert(container.hasRegistration('FOO'), 'FOO should be registered');
     assert(container.hasRegistration('BAR'), 'BAR should be registered');
+});
+
+test('loadModules should throw an error for invalid modules', async (t) => {
+    const container = createMockContainer();
+    const options = {};
+
+    await assert.rejects(
+        async () => {
+            await loadModules(container, invalidModules, options);
+        },
+        (err) => {
+            assert.strictEqual(err.name, 'AwilixViteError');
+            assert.match(err.message, /Failed to get name and module from path/);
+            return true;
+        },
+        'loadModules should throw an error for invalid modules'
+    );
 });

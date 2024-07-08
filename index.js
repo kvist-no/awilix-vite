@@ -1,6 +1,10 @@
 import { RESOLVER, asClass, asFunction } from 'awilix'
 import { isFunction, isClass } from 'awilix/lib/utils.js'
 
+class AwilixViteError extends Error {
+    name = "AwilixViteError"
+}
+
 /**
  * @typedef {Object<string, () => Promise<any>>} DynamicImportModules
  * @typedef {Object<string, any>} StaticImportModules
@@ -14,16 +18,11 @@ import { isFunction, isClass } from 'awilix/lib/utils.js'
  * @param {LoadOptions} options
  */
 export async function loadModules(container, globResult, options) {
-    /**
-     * @type {[string, any][]}
-     */
-    const loadedModules = await Promise.all(Object.entries(globResult).map(async ([path, mod]) => {
-        const loadedModule = isFunction(mod) ? await mod() : mod
-        return [path, loadedModule]
-    }))
+    if(Object.values(globResult).some(mod => isFunction(mod))) {
+        throw new AwilixViteError("Dynamic imports detected in the result of import.meta.glob. Please set the eager option to true in the import.meta.glob call like this \"import.meta.glob('/*.ts', { eager: true })\".")
+    }
 
-
-    for(const [path, loadedModule] of loadedModules) {
+    for(const [path, loadedModule] of Object.entries(globResult)) {
         const [name, resolvedModule] = getNameAndModule(path, loadedModule)
         const formatedName = options?.formatName ? options.formatName(name) : formatNameToCamelCase(name)
 
@@ -39,16 +38,16 @@ export async function loadModules(container, globResult, options) {
  */
 function getNameAndModule(path, loadedModule) {
     const name = path
-    // Replace Windows path separators with Posix path
-    .replace(/\\/g, '/')
-    // Split the path...
-    .split('/')
-    // ... and take the last part of the filepath
-    .pop()
-    // Split the result with . 
-    .split('.')
-    // And expect the first result of the split to be the name of the file
-    .shift()
+        // Replace Windows path separators with Posix path
+        .replace(/\\/g, '/')
+        // Split the path...
+        .split('/')
+        // ... and take the last part of the filepath
+        .pop()
+        // Split the result with . 
+        .split('.')
+        // And expect the first result of the split to be the name of the file
+        .shift()
 
     if (loadedModule.default && isFunction(loadedModule.default)) {
         // ES6 default export
@@ -63,12 +62,12 @@ function getNameAndModule(path, loadedModule) {
           continue
         }
     
-        if (isFunction(value) && RESOLVER in value) {
+        if (RESOLVER in value && isFunction(value)) {
             return [key, value]
         }
     }
 
-    throw new Error(`Failed to get name and module from path "${path}"`)
+    throw new AwilixViteError(`Failed to get name and module from path "${path}"`)
 }
 
 function formatNameToCamelCase(string) {
