@@ -39,12 +39,12 @@ function createMockContainer() {
 }
 
 // Test dynamic imports
-test('should throw when using loadModules with dynamic imports (eager: false)', async (t) => {
+test('should throw when using loadModules with dynamic imports (eager: false)', () => {
     const container = createMockContainer();
 
-    await assert.rejects(
+    assert.rejects(
         async () => {
-            await loadModules(container, dynamicModules);
+             loadModules(container, dynamicModules);
         },
         (err) => {
             assert.strictEqual(err.name, 'AwilixViteError');
@@ -57,10 +57,10 @@ test('should throw when using loadModules with dynamic imports (eager: false)', 
 
 
 // Test static imports
-test('loadModules with static imports (eager: true)', async (t) => {
+test('loadModules with static imports (eager: true)', () => {
     const container = createMockContainer();
 
-    await loadModules(container, staticModules);
+     loadModules(container, staticModules);
 
     assert(container.hasRegistration('foo'), 'foo should be registered');
     assert(container.hasRegistration('bar'), 'bar should be registered');
@@ -68,11 +68,11 @@ test('loadModules with static imports (eager: true)', async (t) => {
 });
 
 // Test static imports
-test('loadModules with static imports and options (eager: true)', async (t) => {
+test('loadModules with static imports and options (eager: true)', () => {
     const container = createMockContainer();
     const options = { formatName };
 
-    await loadModules(container, staticModules, options);
+     loadModules(container, staticModules, options);
 
     assert(container.hasRegistration('FOO'), 'FOO should be registered');
     assert(container.hasRegistration('BAR'), 'BAR should be registered');
@@ -80,11 +80,11 @@ test('loadModules with static imports and options (eager: true)', async (t) => {
 });
 
 // Test with resolverOptions using asClass
-test('loadModules with resolverOptions using asClass', async (t) => {
+test('loadModules with resolverOptions using asClass', () => {
     const container = createMockContainer();
     const options = { resolverOptions: { register: asClass } };
 
-    await loadModules(container, staticModules, options);
+     loadModules(container, staticModules, options);
 
     assert(container.hasRegistration('foo'), 'foo should be registered');
     assert(container.hasRegistration('bar'), 'bar should be registered');
@@ -94,11 +94,11 @@ test('loadModules with resolverOptions using asClass', async (t) => {
 });
 
 // Test with resolverOptions using asFunction
-test('loadModules with resolverOptions using asFunction', async (t) => {
+test('loadModules with resolverOptions using asFunction', () => {
     const container = createMockContainer();
     const options = { resolverOptions: { register: asFunction } };
 
-    await loadModules(container, staticModules, options);
+     loadModules(container, staticModules, options);
 
     assert(container.hasRegistration('foo'), 'foo should be registered');
     assert(container.hasRegistration('bar'), 'bar should be registered');
@@ -107,23 +107,23 @@ test('loadModules with resolverOptions using asFunction', async (t) => {
 
 
 // Test with custom formatName
-test('loadModules with custom formatName', async (t) => {
+test('loadModules with custom formatName', () => {
     const container = createMockContainer();
     const options = { formatName };
 
-    await loadModules(container, staticModules, options);
+     loadModules(container, staticModules, options);
 
     assert(container.hasRegistration('FOO'), 'FOO should be registered');
     assert(container.hasRegistration('BAR'), 'BAR should be registered');
 });
 
-test('loadModules should throw an error for invalid modules', async (t) => {
+test('loadModules should throw an error for invalid modules', () => {
     const container = createMockContainer();
     const options = {};
 
-    await assert.rejects(
+    assert.rejects(
         async () => {
-            await loadModules(container, invalidModules, options);
+             loadModules(container, invalidModules, options);
         },
         (err) => {
             assert.strictEqual(err.name, 'AwilixViteError');
