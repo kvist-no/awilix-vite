@@ -43,7 +43,7 @@ loadModules(container, modules, {
 });
 ```
 
-#### Why use { eager: true}?
+#### Why use { eager: true }?
 
 When using `import.meta.glob` Vite will transform the code 
 
