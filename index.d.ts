@@ -9,7 +9,7 @@
  * @param {DynamicImportModules|StaticImportModules} globResult - The result of either doing import.meta.glob('/*.ts') or import.meta.glob('/*.ts', { eager: true })
  * @param {LoadOptions} options
  */
-export function loadModules(container: import('awilix').AwilixContainer, globResult: DynamicImportModules | StaticImportModules, options: LoadOptions): Promise<void>;
+export function loadModules(container: import('awilix').AwilixContainer, globResult: DynamicImportModules | StaticImportModules, options: LoadOptions): void;
 export type DynamicImportModules = {
     [x: string]: () => Promise<any>;
 };

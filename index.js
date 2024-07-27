@@ -17,7 +17,7 @@ class AwilixViteError extends Error {
  * @param {DynamicImportModules|StaticImportModules} globResult - The result of either doing import.meta.glob('/*.ts') or import.meta.glob('/*.ts', { eager: true })
  * @param {LoadOptions} options
  */
-export async function loadModules(container, globResult, options) {
+export function loadModules(container, globResult, options) {
     if(Object.values(globResult).some(mod => isFunction(mod))) {
         throw new AwilixViteError("Dynamic imports detected in the result of import.meta.glob. Please set the eager option to true in the import.meta.glob call like this \"import.meta.glob('/*.ts', { eager: true })\".")
     }
