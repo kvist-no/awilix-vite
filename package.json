@@ -1,12 +1,25 @@
 {
   "name": "awilix-vite",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Use Awilix in Vite projects",
-  "main": "index.js",
+  "repository": "kvist-no/awilix-vite",
   "scripts": {
     "test": "node index.test.js"
   },
-  "keywords": [],
+  "exports": {
+		"types": "./index.d.ts",
+		"default": "./index.js"
+	},
+  "files": [
+		"index.js",
+		"index.d.ts"
+	],
+  "keywords": [
+    "awilix",
+    "vite",
+    "dependency",
+    "injection"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
