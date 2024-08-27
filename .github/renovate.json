@@ -1,0 +1,18 @@
+{
+	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
+	"extends": ["config:base", "group:allNonMajor", ":semanticCommits"],
+	"schedule": ["before 9am"],
+	"baseBranches": ["trunk"],
+	"labels": ["dependencies"],
+	"rangeStrategy": "bump",
+	"packageRules": [
+		{
+			"matchDepTypes": ["peerDependencies"],
+			"enabled": false
+		},
+		{
+			"packageNames": ["pnpm", "node"],
+			"enabled": false
+		}
+	]
+}
