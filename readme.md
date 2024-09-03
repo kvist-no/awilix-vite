@@ -104,7 +104,7 @@ Parameters
     - resolverOptions: Optional Awilix resolver options.
     - formatName: Optional function to format module names.
 
-## Gotcha's
+## Why do i have to use `import.meta.glob`?
 
 The `import.meta.glob` method will be transformed by Vite from
 
