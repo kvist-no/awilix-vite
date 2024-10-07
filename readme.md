@@ -1,6 +1,6 @@
 # awilix-vite
 
-The awilix-vite plugin is designed for the Awilix dependency injection library. It provides a loadModules method that allows Vite users to achieve almost the same behavior as the loadModules method in the original Awilix library by using Vite's `import.meta.glob`. The available `loadModules` method will take the result from `import.meta.glob` and load the modules correctly with Awilix.
+The awilix-vite plugin is designed for the [Awilix dependency injection library](https://github.com/jeffijoe/awilix). It provides a loadModules method that allows Vite users to achieve almost the same behavior as the loadModules method in the original Awilix library by using Vite's `import.meta.glob`. The available `loadModules` method will take the result from `import.meta.glob` and load the modules correctly with Awilix.
 
 ## Installation
 To install the awilix-vite plugin, you need to have Awilix and Vite set up in your project. You can then install the plugin via your desired package manager:
@@ -104,7 +104,7 @@ Parameters
     - resolverOptions: Optional Awilix resolver options.
     - formatName: Optional function to format module names.
 
-## Gotcha's
+## Why do i have to use `import.meta.glob`?
 
 The `import.meta.glob` method will be transformed by Vite from
 
