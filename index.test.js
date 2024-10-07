@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createContainer, asClass, asFunction, RESOLVER } from 'awilix';
+import { createContainer, asClass, asFunction, RESOLVER } from 'awilix/browser';
 import { loadModules } from './index.js';
 
 // Mock modules

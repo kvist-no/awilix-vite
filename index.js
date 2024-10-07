@@ -1,5 +1,4 @@
-import { RESOLVER, asClass, asFunction } from 'awilix'
-import { isFunction, isClass } from 'awilix/lib/utils.js'
+import { RESOLVER, asClass, asFunction, isClass, isFunction } from 'awilix/browser'
 
 class AwilixViteError extends Error {
     name = "AwilixViteError"
