@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       awilix:
-        specifier: ^10.0.2
-        version: 10.0.2
+        specifier: ^12.0.1
+        version: 12.0.1
 
 packages:
 
@@ -26,9 +26,9 @@ packages:
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
 
-  awilix@10.0.2:
-    resolution: {integrity: sha512-hFatb7eZFdtiWjjmGRSm/K/uxZpmcBlM+YoeMB3VpOPXk3xa6+7zctg3LRbUzoimom5bwGrePF0jXReO6b4zNQ==}
-    engines: {node: '>=14.0.0'}
+  awilix@12.0.1:
+    resolution: {integrity: sha512-E5z/JhcokkANolIYbMcH93q5WAaz+vcPuRYkwaoESsjeHfKzAkSM8S2rZstbuOP8Thq4/+WgNbFlz8PI9wH1Jw==}
+    engines: {node: '>=16.3.0'}
 
   braces@3.0.3:
     resolution: {integrity: sha512-yQbXgO/OSZVD2IsiLlro+7Hf6Q18EJrKSEsdoMzKePKXct3gvD8oLcOQdIzGupr5Fj+EDe8gO/lxc1BzfMpxvA==}
@@ -116,7 +116,7 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.17.1
 
-  awilix@10.0.2:
+  awilix@12.0.1:
     dependencies:
       camel-case: 4.1.2
       fast-glob: 3.3.2
