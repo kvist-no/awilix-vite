@@ -16,7 +16,7 @@ The `loadModules` method provided by this plugin allows you to load and register
 ### Importing the Plugin
 
 ```javascript
-import { createContainer } from 'awilix';
+import { createContainer } from 'awilix/browser';
 import { loadModules } from 'awilix-vite';
 ```
 
@@ -78,7 +78,7 @@ When using `loadModules` all the modules are supposed to be loaded immediately, 
 Here's a complete example of how to use the awilix-vite plugin to load and register modules.
 
 ```javascript
-import { createContainer } from 'awilix';
+import { createContainer } from 'awilix/browser';
 import { loadModules } from 'awilix-vite';
 
 const container = createContainer();
