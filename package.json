@@ -1,6 +1,6 @@
 {
   "name": "awilix-vite",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "Use Awilix in Vite projects",
   "repository": "kvist-no/awilix-vite",
   "scripts": {
@@ -23,7 +23,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "awilix": "^12.0.2-alpha.0"
+    "awilix": "^12.0.2"
   },
   "type": "module"
 }
