@@ -99,7 +99,7 @@ loadModules(container, modules, {
 
 Parameters
 - container (required): The Awilix container where the modules should be registered.
-- globResult (required): The result of either import.meta.glob('/*.js') or import.meta.glob('/*.js', { eager: true }).
+- globResult (required): The result of `import.meta.glob('./dir/*.js', { eager: true })`.
 - options (optional): An object containing the following properties:
     - resolverOptions: Optional Awilix resolver options.
     - formatName: Optional function to format module names.
