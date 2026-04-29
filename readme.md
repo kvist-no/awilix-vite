@@ -101,35 +101,48 @@ Parameters
 - container (required): The Awilix container where the modules should be registered.
 - globResult (required): The result of `import.meta.glob('./dir/*.js', { eager: true })`.
 - options (optional): An object containing the following properties:
-    - resolverOptions: Optional Awilix resolver options.
-    - formatName: Optional function to format module names.
+    - `resolverOptions`: Optional Awilix resolver options (e.g. `lifetime`).
+    - `formatName`: Optional function to format module names.
+    - `lazy`: When `true`, defer reading each module's default export to resolve
+      time. Use this in large applications to avoid Vite dev-server
+      module-loading races. See [Lazy mode](#lazy-mode) below.
 
-## Known issues
+## Lazy mode
 
-### Sporadic "Failed to register module at ..." on dev startup
-
-In large applications (hundreds of modules in a single eager glob), you may
-occasionally see `AwilixViteError: Failed to register module at "<path>"` on a
-cold dev-server start, where the failing path differs between runs. The file
-itself is fine; it has a valid default export.
+By default, `loadModules` reads `loadedModule.default` for every entry as it
+walks the glob result and registers each one immediately. In small projects
+this is fine, but in large applications with hundreds of modules in a single
+eager glob, you may occasionally see `AwilixViteError: Failed to register
+module at "<path>"` on a cold dev-server start — where the failing path
+differs between runs and the file itself has a valid default export.
 
 This is a Vite dev-server module-loading race: under SSR with a very large
-eager glob, a module's namespace can be observed mid-evaluation, with `default`
-not yet populated. `awilix-vite` reads `default` synchronously, so it fails for
-that one module.
+eager glob, a module's namespace can be observed mid-evaluation, with
+`default` not yet populated. The eager read trips on it.
 
-Workarounds on the consumer side:
-- Register modules **lazily** by writing a small wrapper that uses
-  `asFunction((cradle) => new mod.default(cradle)).singleton()`. The
-  `mod.default` access is then deferred to first resolve, by which time module
-  evaluation has completed.
-- Reduce the eager glob's surface area (split it, or move some files behind a
-  separate non-eager glob).
-- Add Vite `server.warmup` entries pointing at the heaviest modules so they're
-  pre-transformed before the request that triggers the glob.
+Pass `lazy: true` to defer the read to first resolve. By then, module
+evaluation has completed and the namespace is fully populated. The race window
+is gone.
 
-If a failure is reproducible (always the same path), the file genuinely lacks
-a usable default export — the error message lists what was found.
+```javascript
+const modules = import.meta.glob('./services/**/*.ts', { eager: true });
+
+loadModules(container, modules, {
+  lazy: true,
+  resolverOptions: { lifetime: 'SINGLETON' }
+});
+```
+
+Lazy mode supports default exports only. For modules using a `RESOLVER`-tagged
+named export, omit `lazy` and use the default (eager) mode. The
+`resolverOptions.register` option is ignored in lazy mode (the resolver is
+always `asFunction`, which dispatches via `new` for classes and a plain call
+for factory functions).
+
+If `default` is still missing or non-callable at resolve time, the resolver
+throws an `AwilixViteError` describing what was actually present. A failure
+that's reproducible at resolve time (always the same module) means the file
+genuinely lacks a usable default export.
 
 ## Why do i have to use `import.meta.glob`?
 
