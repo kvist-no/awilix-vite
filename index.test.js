@@ -117,19 +117,78 @@ test('loadModules with custom formatName', () => {
     assert(container.hasRegistration('BAR'), 'BAR should be registered');
 });
 
-test('loadModules should throw an error for invalid modules', () => {
+test('loadModules should throw a descriptive error for invalid modules', () => {
     const container = createMockContainer();
     const options = {};
 
-    assert.rejects(
-        async () => {
+    assert.throws(
+        () => {
              loadModules(container, invalidModules, options);
         },
         (err) => {
             assert.strictEqual(err.name, 'AwilixViteError');
-            assert.match(err.message, /Failed to get name and module from path/);
+            assert.match(err.message, /Failed to register module at "\.\/dir\/invalid\.js"/);
+            // Error should describe the default export and list other exports so the
+            // caller can quickly tell whether the file is malformed or whether they hit
+            // a transient module-loading race.
+            assert.match(err.message, /default export is missing/);
+            assert.match(err.message, /\[invalidExport\]/);
             return true;
         },
-        'loadModules should throw an error for invalid modules'
+        'loadModules should throw a descriptive error for invalid modules'
+    );
+});
+
+test('loadModules describes a non-function default export in the error message', () => {
+    const container = createMockContainer();
+
+    assert.throws(
+        () => {
+             loadModules(container, { './dir/object-default.js': { default: { not: 'a function' } } });
+        },
+        (err) => {
+            assert.strictEqual(err.name, 'AwilixViteError');
+            assert.match(err.message, /default export is object/);
+            return true;
+        }
+    );
+});
+
+test('loadModules tolerates primitive named exports alongside a valid default', () => {
+    // Regression: previously, any non-object/non-function named export caused
+    // `RESOLVER in value` to throw a TypeError before the default branch could
+    // succeed for a sibling module — crashing the whole loader. Files commonly
+    // export constants like version strings, so this needs to just work.
+    const container = createMockContainer();
+    const modules = {
+        './dir/withPrimitive.js': {
+            default: class WithPrimitive {},
+            VERSION: '1.0.0',
+            COUNT: 42,
+            FLAG: true,
+            EMPTY: null
+        }
+    };
+
+    loadModules(container, modules);
+
+    assert(container.hasRegistration('withPrimitive'), 'withPrimitive should be registered');
+});
+
+test('loadModules tolerates primitive named exports when there is no default', () => {
+    // Same regression, but with no default export. The library should still throw
+    // its own descriptive AwilixViteError, not a TypeError from `in` on a primitive.
+    const container = createMockContainer();
+    const modules = {
+        './dir/onlyPrimitives.js': { VERSION: '1.0.0', COUNT: 42 }
+    };
+
+    assert.throws(
+        () => loadModules(container, modules),
+        (err) => {
+            assert.strictEqual(err.name, 'AwilixViteError');
+            assert.match(err.message, /Failed to register module at "\.\/dir\/onlyPrimitives\.js"/);
+            return true;
+        }
     );
 });

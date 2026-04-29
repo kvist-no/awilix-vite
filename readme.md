@@ -104,6 +104,33 @@ Parameters
     - resolverOptions: Optional Awilix resolver options.
     - formatName: Optional function to format module names.
 
+## Known issues
+
+### Sporadic "Failed to register module at ..." on dev startup
+
+In large applications (hundreds of modules in a single eager glob), you may
+occasionally see `AwilixViteError: Failed to register module at "<path>"` on a
+cold dev-server start, where the failing path differs between runs. The file
+itself is fine; it has a valid default export.
+
+This is a Vite dev-server module-loading race: under SSR with a very large
+eager glob, a module's namespace can be observed mid-evaluation, with `default`
+not yet populated. `awilix-vite` reads `default` synchronously, so it fails for
+that one module.
+
+Workarounds on the consumer side:
+- Register modules **lazily** by writing a small wrapper that uses
+  `asFunction((cradle) => new mod.default(cradle)).singleton()`. The
+  `mod.default` access is then deferred to first resolve, by which time module
+  evaluation has completed.
+- Reduce the eager glob's surface area (split it, or move some files behind a
+  separate non-eager glob).
+- Add Vite `server.warmup` entries pointing at the heaviest modules so they're
+  pre-transformed before the request that triggers the glob.
+
+If a failure is reproducible (always the same path), the file genuinely lacks
+a usable default export — the error message lists what was found.
+
 ## Why do i have to use `import.meta.glob`?
 
 The `import.meta.glob` method will be transformed by Vite from
