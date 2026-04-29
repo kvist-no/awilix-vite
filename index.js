@@ -52,7 +52,7 @@ function getNameAndModule(path, loadedModule) {
         // ES6 default export
         return [name, loadedModule.default]
     }
-    
+
     // loop through non-default exports, but require the RESOLVER property set for
     // it to be a valid service module export.
     for (const [key, value] of Object.entries(loadedModule)) {
@@ -60,13 +60,44 @@ function getNameAndModule(path, loadedModule) {
           // default case handled separately due to its different name (file name)
           continue
         }
-    
-        if (RESOLVER in value && isFunction(value)) {
+
+        // isFunction first: `RESOLVER in value` throws a TypeError when `value` is a
+        // primitive (string, number, boolean, etc.), which would otherwise crash
+        // module loading for any file that legitimately exports such a value.
+        if (isFunction(value) && RESOLVER in value) {
             return [key, value]
         }
     }
 
-    throw new AwilixViteError(`Failed to get name and module from path "${path}"`)
+    throw new AwilixViteError(buildLoadFailureMessage(path, loadedModule))
+}
+
+/**
+ * @param {string} path
+ * @param {any} loadedModule
+ */
+function buildLoadFailureMessage(path, loadedModule) {
+    const hasDefault = 'default' in loadedModule
+    const defaultValue = loadedModule.default
+    const defaultDescriptor = !hasDefault
+        ? 'is missing'
+        : defaultValue === null
+            ? 'is null'
+            : `is ${typeof defaultValue}`
+
+    const otherKeys = Object.keys(loadedModule).filter(k => k !== 'default')
+    const otherKeysDescriptor = otherKeys.length
+        ? `[${otherKeys.join(', ')}]`
+        : 'none'
+
+    return (
+        `Failed to register module at "${path}". ` +
+        `default export ${defaultDescriptor} (expected a class or function); ` +
+        `other exports: ${otherKeysDescriptor}. ` +
+        `If this happens sporadically and the file does have a valid default export, ` +
+        `you may be hitting a Vite dev-server module-loading race during cold start ` +
+        `with very large eager globs — see the readme "Known issues" section.`
+    )
 }
 
 function formatNameToCamelCase(string) {
